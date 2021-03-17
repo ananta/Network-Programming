@@ -1,0 +1,72 @@
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include<arpa/net.h>
+#include<stdlib.h>
+#include<string.h>
+#include<unistd.h>
+int main(void){
+    //allocate resource
+    int socjetFD = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    /*
+    AF = Address Family
+    PF = Protocol Family
+    */
+    if(socjetFD == -1){
+        perror("Cannot create socket.");    //like print error
+        exit(EXIT_FAILURE);
+
+    }
+    //type of sockaddr_in
+    struct sockaddr_in sa;
+    memset(&sa,0, sizedof sa);
+
+    //bzero(&sa, sizedof a);
+
+    sa.sin_family = AF_NET;
+    sa.sin_port = hton(5678); //direct assign garna painna suru ma host order ma hucha teslai netw byte order ma change garnu parcha
+    //hton = host to network
+    sa.sin_addr.s_addr = htonl(INADDR_ANY);
+
+
+    //requires generic type so tyecasting sa required
+    //sockaddr --> sockaddr_in
+    //tyecasting since it is a structure so struct pani lekhna parcha
+    //pointer bhako le poiner casting ho bhanna parcha
+    int res = bind(socketFD, (struct sockaddr *) &sa, sizedof sa);// length kina pathako bhanda ipv4 or ipv6 ma length kati bela aaucha thaha hunna 1st ki last tei bhayera
+
+    if(res == -1){
+        perror("Cannot bind socketFD and structure"); 
+        close(socketFD);// socket close gareko since no garbage collector [preventing memory leak] 
+        exit(EXIT_FAILURE);//like print error
+    }
+    if(listen(socketFD, 10) == -1){
+         perror("Listen failed"); 
+        close(socketFD);// socket close gareko since no garbage collector [preventing memory leak] 
+        exit(EXIT_FAILURE);//like print error
+    }
+
+    for(;;){ //infinite loop
+        int ConnectFD = accept(socketFD, null, null);
+
+        if(0> ConnectFD){
+             perror("COnnect failed failed"); 
+        close(socketFD);// socket close gareko since no garbage collector [preventing memory leak] 
+        exit(EXIT_FAILURE);//continue gare hucha exit garna pardaina
+        }
+
+        //read write yaha 
+
+        if(shutDown(ConnectFD, SHUT_DOWN) == -1){
+            perror("Shutdown failed"); 
+            close(ConnectFD);
+        close(socketFD);// socket close gareko since no garbage collector [preventing memory leak] 
+        exit(EXIT_FAILURE);
+        }
+        close(ConnectFD);
+    }
+    close(ConnectFD);
+    return EXIT_SUCCESS;
+
+
+}
